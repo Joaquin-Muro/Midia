@@ -881,6 +881,7 @@ body {
   <button class="tab"        onclick="sw('habitos')" id="t-habitos">Hábitos</button>
   <button class="tab"        onclick="sw('stats')"   id="t-stats">Stats</button>
   <button class="tab"        onclick="sw('dificil')" id="t-dificil">😶 Sin ganas</button>
+  <button class="tab"        onclick="sw('guia')"    id="t-guia">📖 Guía</button>
 </div>
 
 <!-- PANEL: HOY -->
@@ -1073,7 +1074,145 @@ body {
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- PANEL: GUÍA -->
+<div class="panel" id="p-guia">
+
+  <div style="padding:4px 0 20px">
+
+    <!-- Bienvenida -->
+    <div style="background:linear-gradient(135deg,rgba(245,166,35,0.1),rgba(245,166,35,0.03));border:1px solid var(--impBorder);border-radius:14px;padding:20px;margin-bottom:12px;text-align:center">
+      <div style="font-size:36px;margin-bottom:10px">👋</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Bienvenido a <span style="color:var(--imp)">Mi Día</span></div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">Tu organizador personal. Simple, visual y pensado para que realmente lo uses todos los días.</div>
+    </div>
+
+    <!-- Sección HOY -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;background:rgba(245,166,35,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🕐</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">HOY — Tu rutina del día</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        ✦ Ves todos tus bloques ordenados por hora<br>
+        ✦ El bloque actual aparece marcado como <span style="color:var(--imp);font-weight:600">AHORA</span><br>
+        ✦ <strong style="color:var(--text)">Tocá el cuadrado</strong> para marcar como hecho ✓<br>
+        ✦ Tocá de nuevo para aplicar <span style="color:var(--blue)">Plan B</span> (versión mínima)<br>
+        ✦ Tocá la tarjeta para abrir el <strong style="color:var(--text)">modo enfoque</strong> con timer<br>
+        ✦ El lápiz ✏️ te deja editar o eliminar cualquier bloque<br>
+        ✦ El botón de abajo te permite <strong style="color:var(--text)">agregar bloques nuevos</strong>
+      </div>
+    </div>
+
+    <!-- Prioridades -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;background:rgba(255,68,68,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🔥</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">Sistema de Prioridades</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--s2);border-radius:10px">
+          <span style="font-size:18px">🔥</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--crit)">Crítico</div>
+            <div style="font-size:11px;color:var(--muted)">Pesa el triple en tu progreso. No lo saltes.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--s2);border-radius:10px">
+          <span style="font-size:18px">⚡</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--imp)">Importante</div>
+            <div style="font-size:11px;color:var(--muted)">Pesa el doble. Intentá cumplirlo.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--s2);border-radius:10px">
+          <span style="font-size:18px">💤</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--muted)">Opcional</div>
+            <div style="font-size:11px;color:var(--muted)">Si podés, bien. Si no, no pasa nada.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan B -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;background:rgba(74,158,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">◑</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">Plan B — Versión mínima</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        Cuando no podés hacer la tarea completa, aplicás el Plan B.<br><br>
+        Ejemplo: En vez de 1 hora de gym, hacés 15 minutos.<br><br>
+        <span style="color:var(--blue)">Igual cuenta como progreso parcial.</span> Porque algo siempre es mejor que nada.
+      </div>
+    </div>
+
+    <!-- Modo enfoque -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;background:rgba(46,204,113,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🎯</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">Modo Enfoque</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        Tocás cualquier tarea → se abre una pantalla limpia solo con esa tarea.<br><br>
+        ✦ Temporizador para medir el tiempo<br>
+        ✦ Sin distracciones<br>
+        ✦ Al terminar marcás si lo completaste o si usaste el Plan B
+      </div>
+    </div>
+
+    <!-- Hábitos -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;background:rgba(155,123,201,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">💪</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">Hábitos</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        ✦ Los puntitos muestran tu <strong style="color:var(--text)">racha de 7 días</strong><br>
+        ✦ Tocás el hábito para marcarlo como hecho<br>
+        ✦ Se resetean solos cada día<br>
+        ✦ Podés agregar los hábitos que quieras
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;background:rgba(245,166,35,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">📊</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">Estadísticas</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        ✦ Progreso de hoy en porcentaje<br>
+        ✦ Racha de días consecutivos 🔥<br>
+        ✦ Gráfico de actividad de la semana<br>
+        ✦ Historial guardado automáticamente
+      </div>
+    </div>
+
+    <!-- Sin ganas -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;background:rgba(255,255,255,0.05);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">😶</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">Sin Ganas</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        Para los días difíciles. Sin presión.<br><br>
+        ✦ Elegís qué tipo de acción pequeña hacer<br>
+        ✦ Timer de 5 minutos<br>
+        ✦ Sin exigirte nada grande<br>
+        ✦ <span style="color:var(--text)">Porque empezar mal igual es empezar.</span>
+      </div>
+    </div>
+
+    <!-- Tip final -->
+    <div style="background:linear-gradient(135deg,rgba(245,166,35,0.08),rgba(245,166,35,0.02));border:1px solid var(--impBorder);border-radius:14px;padding:18px;text-align:center">
+      <div style="font-size:24px;margin-bottom:10px">💡</div>
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--imp)">Todo se guarda automáticamente</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">No necesitás hacer nada especial. Cerrás la app y cuando volvés todo sigue igual. El historial de días anteriores se guarda por 30 días.</div>
+    </div>
+
+  </div>
+</div><!-- /p-guia -->
 <div class="bnav">
   <div class="bnav-inner">
     <button class="nb active" onclick="sw('hoy')" id="n-hoy">
@@ -1091,6 +1230,10 @@ body {
     <button class="nb" onclick="sw('dificil')" id="n-dificil">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 15s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9" stroke-width="3" stroke-linecap="round"/><line x1="15" y1="9" x2="15.01" y2="9" stroke-width="3" stroke-linecap="round"/></svg>
       Sin ganas
+    </button>
+    <button class="nb" onclick="sw('guia')" id="n-guia">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Guía
     </button>
   </div>
 </div>
