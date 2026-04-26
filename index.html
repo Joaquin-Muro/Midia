@@ -998,11 +998,12 @@ body {
 
 .wlc-phrase {
   font-size:15px; line-height:1.7;
-  color:var(--muted); font-style:italic;
+  color:var(--text); font-style:italic;
   text-align:center; max-width:300px;
   margin-bottom:48px;
-  border-left:2px solid var(--impBorder);
+  border-left:2px solid var(--imp);
   padding-left:16px;
+  opacity:0.9;
 }
 
 /* Screens inside welcome */
@@ -1059,8 +1060,11 @@ body {
 }
 .wlc-btn:active { transform:scale(0.97); }
 
-.wlc-link {
-  background:none; border:none; color:var(--muted);
+.wlc-error {
+  font-size:12px; color:var(--crit);
+  margin-bottom:10px; min-height:18px;
+  text-align:center; font-weight:500;
+}
   font-family:'DM Sans',sans-serif; font-size:13px;
   cursor:pointer; text-decoration:underline;
   text-underline-offset:3px; width:100%; text-align:center;
@@ -1108,35 +1112,36 @@ body {
 <div class="welcome-overlay" id="welcomeOverlay">
 
   <div class="wlc-logo">Mi <span>Día</span></div>
-  <div class="wlc-tagline">Tu organizador personal</div>
+  <div class="wlc-tagline">Organizador personal</div>
 
-  <div class="wlc-phrase" id="wlcPhrase">
-    "No necesitás motivación para empezar.<br>Solo necesitás empezar."
-  </div>
+  <div class="wlc-phrase" id="wlcPhrase"></div>
 
-  <!-- SCREEN: Bienvenida -->
+  <!-- SCREEN: Inicio -->
   <div class="wlc-screen active" id="wlc-inicio">
-    <button class="wlc-btn" onclick="wlcShow('registro')">Crear mi usuario</button>
-    <button class="wlc-btn" style="background:var(--s1);color:var(--text);border:1px solid var(--border)" onclick="wlcShow('login')">Ya tengo usuario</button>
+    <button class="wlc-btn" onclick="wlcShow('registro')">Crear cuenta</button>
+    <button class="wlc-btn" style="background:var(--s2);color:var(--text);border:1px solid var(--border);margin-top:0" onclick="wlcShow('login')">Iniciar sesión</button>
   </div>
 
   <!-- SCREEN: Registro -->
   <div class="wlc-screen" id="wlc-registro">
-    <div class="wlc-title">¿Cómo te llamás?</div>
-    <div class="wlc-sub">Elegí un avatar y tu nombre.<br>Solo lo ve vos.</div>
-    <div class="wlc-avatar-row" id="wlcAvatars">
-      🦁 🐺 🦊 🐻 🦅 🐬 🌙 ⚡ 🔥 🎯 💪 🚀
-    </div>
-    <input class="wlc-fi" id="wlc-nombre" placeholder="Tu nombre o apodo..." autocomplete="off" maxlength="20"/>
-    <button class="wlc-btn" onclick="wlcRegistrar()">Empezar →</button>
+    <div class="wlc-title">Crear cuenta</div>
+    <div class="wlc-sub">Tus datos se guardan solo en este dispositivo.</div>
+    <input class="wlc-fi" id="reg-nombre" placeholder="Nombre completo" autocomplete="off" maxlength="30"/>
+    <input class="wlc-fi" id="reg-usuario" placeholder="Nombre de usuario (sin espacios)" autocomplete="off" maxlength="20"/>
+    <input class="wlc-fi" id="reg-pass" type="password" placeholder="Contraseña" maxlength="30"/>
+    <input class="wlc-fi" id="reg-pass2" type="password" placeholder="Repetir contraseña" maxlength="30"/>
+    <div class="wlc-error" id="reg-error"></div>
+    <button class="wlc-btn" onclick="wlcRegistrar()">Crear cuenta →</button>
     <button class="wlc-link" onclick="wlcShow('inicio')">← Volver</button>
   </div>
 
   <!-- SCREEN: Login -->
   <div class="wlc-screen" id="wlc-login">
-    <div class="wlc-title">Bienvenido de nuevo</div>
-    <div class="wlc-sub">Ingresá tu nombre para continuar.</div>
-    <input class="wlc-fi" id="wlc-login-nombre" placeholder="Tu nombre o apodo..." autocomplete="off" maxlength="20"/>
+    <div class="wlc-title">Iniciar sesión</div>
+    <div class="wlc-sub">Ingresá con tu usuario y contraseña.</div>
+    <input class="wlc-fi" id="log-usuario" placeholder="Nombre de usuario" autocomplete="off" maxlength="20"/>
+    <input class="wlc-fi" id="log-pass" type="password" placeholder="Contraseña" maxlength="30"/>
+    <div class="wlc-error" id="log-error"></div>
     <button class="wlc-btn" onclick="wlcLogin()">Entrar →</button>
     <button class="wlc-link" onclick="wlcShow('inicio')">← Volver</button>
   </div>
@@ -1601,30 +1606,8 @@ function nextQuote() {
 /* ══════════════════════════════════════════
    DEFAULT ROUTINE
 ══════════════════════════════════════════ */
-const DEFAULT_BLOCKS = [
-  { id:'b1',  name:'Despertar y prepararse', start:'06:00', end:'07:00', emoji:'☀️', pri:'crit', planb:'Al menos levantarse y tomar agua', note:'Levantarse, tomar agua, preparar mochila.' },
-  { id:'b2',  name:'Gym',                    start:'07:00', end:'08:00', emoji:'💪', pri:'crit', planb:'Al menos 15 min de ejercicio en casa', note:'Constancia ante todo.' },
-  { id:'b3',  name:'Baño e ir al local',     start:'08:00', end:'09:00', emoji:'🚿', pri:'crit', planb:'Baño rápido y salir', note:'Ducha, desayuno, viaje.' },
-  { id:'b4',  name:'Local — Mañana',         start:'09:00', end:'12:00', emoji:'🏪', pri:'crit', planb:'Al menos 1 hora de atención', note:'Clientes, reparaciones, stock.' },
-  { id:'b5',  name:'Almorzar en casa',       start:'12:00', end:'13:30', emoji:'🍽️', pri:'imp',  planb:'Comer algo rápido', note:'Pausa del mediodía.' },
-  { id:'b6',  name:'Siesta 30 minutos',      start:'13:30', end:'14:00', emoji:'😴', pri:'imp',  planb:'Al menos cerrar los ojos 10 min', note:'Poner alarma.' },
-  { id:'b7',  name:'Hacer el curso',         start:'14:00', end:'15:00', emoji:'📚', pri:'crit', planb:'Al menos 20 minutos del curso', note:'Avanzar un tema.' },
-  { id:'b8',  name:'Leer libro',             start:'15:00', end:'15:30', emoji:'📖', pri:'imp',  planb:'Al menos 10 páginas', note:'Hábito clave.' },
-  { id:'b9',  name:'Ir al local — Tarde',    start:'15:30', end:'16:00', emoji:'🛵', pri:'crit', planb:'Salir aunque sea tarde', note:'Preparar la tarde.' },
-  { id:'b10', name:'Local — Tarde',          start:'16:00', end:'20:00', emoji:'🔧', pri:'crit', planb:'Al menos hasta las 18hs', note:'Reparaciones, ventas.' },
-  { id:'b11', name:'Ir a casa y cenar',      start:'20:00', end:'21:00', emoji:'🏠', pri:'imp',  planb:'Comer algo liviano', note:'Cerrar el local, cenar.' },
-  { id:'b12', name:'Leer y relajarse',       start:'21:00', end:'23:00', emoji:'🌙', pri:'opt',  planb:'Al menos 15 min sin pantallas', note:'Sin redes. Leer o música.' },
-  { id:'b13', name:'Dormir',                 start:'23:00', end:'06:00', emoji:'🛏️', pri:'crit', planb:'Intentar dormir antes de la 1am', note:'8 horas = mejor rendimiento.' },
-];
-
-const DEFAULT_HABITS = [
-  { id:'h1', name:'Gym',                  streak:[1,1,0,1,1,1,0], done:false },
-  { id:'h2', name:'Leer libro',           streak:[1,1,1,0,1,0,0], done:false },
-  { id:'h3', name:'Hacer el curso',       streak:[0,1,1,1,0,1,0], done:false },
-  { id:'h4', name:'Despertar 6am',        streak:[1,0,1,1,1,0,0], done:false },
-  { id:'h5', name:'Dormir antes de 12am', streak:[1,1,1,1,0,1,0], done:false },
-  { id:'h6', name:'Sin redes de noche',   streak:[0,1,0,1,1,0,0], done:false },
-];
+const DEFAULT_BLOCKS = [];
+const DEFAULT_HABITS = [];
 
 /* ══════════════════════════════════════════
    STATE
@@ -1636,45 +1619,51 @@ function getUserKey(base) {
   return base + '_' + id;
 }
 
-const KEY_BLOCKS  = getUserKey('midia_blocks_v4');
-const KEY_STATE   = getUserKey('midia_state_v4');
-const KEY_HABITS  = getUserKey('midia_habits_v4');
-const KEY_HISTORY = getUserKey('midia_history_v4');
-
 const TODAY = new Date().toDateString();
 
-let blocks  = JSON.parse(localStorage.getItem(KEY_BLOCKS)  || 'null') || DEFAULT_BLOCKS;
-let habits  = JSON.parse(localStorage.getItem(KEY_HABITS)  || 'null') || DEFAULT_HABITS;
-let history = JSON.parse(localStorage.getItem(KEY_HISTORY) || '{}');
+// These are loaded dynamically after login via loadUserData()
+let blocks   = [];
+let habits   = [];
+let history  = {};
+let dayState = {};
 
-// Day state: {blockId: 'done'|'partial', _day, _habitDay}
-let dayState = JSON.parse(localStorage.getItem(KEY_STATE) || '{}');
+function loadUserData() {
+  const KB = getUserKey('midia_blocks_v4');
+  const KS = getUserKey('midia_state_v4');
+  const KH = getUserKey('midia_habits_v4');
+  const KR = getUserKey('midia_history_v4');
 
-if(dayState._day !== TODAY) {
-  // Archive yesterday
-  if(dayState._day) {
-    history[dayState._day] = { ...dayState };
-    if(Object.keys(history).length > 30) {
-      const oldest = Object.keys(history).sort()[0];
-      delete history[oldest];
+  blocks   = JSON.parse(localStorage.getItem(KB) || 'null') || JSON.parse(JSON.stringify(DEFAULT_BLOCKS));
+  habits   = JSON.parse(localStorage.getItem(KH) || 'null') || JSON.parse(JSON.stringify(DEFAULT_HABITS));
+  history  = JSON.parse(localStorage.getItem(KR) || '{}');
+  dayState = JSON.parse(localStorage.getItem(KS) || '{}');
+
+  if(dayState._day !== TODAY) {
+    if(dayState._day) {
+      history[dayState._day] = { ...dayState };
+      if(Object.keys(history).length > 30) {
+        const oldest = Object.keys(history).sort()[0];
+        delete history[oldest];
+      }
+      localStorage.setItem(KR, JSON.stringify(history));
     }
-    localStorage.setItem(KEY_HISTORY, JSON.stringify(history));
+    dayState = { _day: TODAY };
+    localStorage.setItem(KS, JSON.stringify(dayState));
   }
-  dayState = { _day: TODAY };
-  localStorage.setItem(KEY_STATE, JSON.stringify(dayState));
-}
 
-if(dayState._habitDay !== TODAY) {
-  habits.forEach(h => h.done = false);
-  dayState._habitDay = TODAY;
+  if(dayState._habitDay !== TODAY) {
+    habits.forEach(h => h.done = false);
+    dayState._habitDay = TODAY;
+  }
+
   saveAll();
 }
 
 function saveAll() {
-  localStorage.setItem(KEY_BLOCKS,  JSON.stringify(blocks));
-  localStorage.setItem(KEY_HABITS,  JSON.stringify(habits));
-  localStorage.setItem(KEY_STATE,   JSON.stringify(dayState));
-  localStorage.setItem(KEY_HISTORY, JSON.stringify(history));
+  localStorage.setItem(getUserKey('midia_blocks_v4'),  JSON.stringify(blocks));
+  localStorage.setItem(getUserKey('midia_habits_v4'),  JSON.stringify(habits));
+  localStorage.setItem(getUserKey('midia_state_v4'),   JSON.stringify(dayState));
+  localStorage.setItem(getUserKey('midia_history_v4'), JSON.stringify(history));
 }
 
 /* ══════════════════════════════════════════
@@ -2367,18 +2356,17 @@ const DIAS_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','
 const DIAS_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const MESES      = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
-const KEY_AGENDA = getUserKey('midia_agenda_v1');
-let agendaData   = JSON.parse(localStorage.getItem(KEY_AGENDA) || '{}');
+const KEY_AGENDA = 'midia_agenda_v1'; // base key, user prefix added via getUserKey
+let agendaData   = {}; // loaded after login in wlcEnterApp
 let agSelectedDay = null; // format: 'YYYY-MM-DD'
 
 function agSave() {
-  localStorage.setItem(KEY_AGENDA, JSON.stringify(agendaData));
+  localStorage.setItem(getUserKey('midia_agenda_v1'), JSON.stringify(agendaData));
 }
 
 function agGetWeek() {
   const today = new Date();
   const dow   = today.getDay(); // 0=Sun
-  // Start from Monday
   const monday = new Date(today);
   monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
 
@@ -2386,8 +2374,16 @@ function agGetWeek() {
   for(let i = 0; i < 7; i++) {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    const key = d.toISOString().slice(0,10);
-    week.push({ date: d, key, isToday: d.toDateString() === today.toDateString() });
+    // Use local date string to avoid UTC offset bug
+    const y   = d.getFullYear();
+    const m   = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    const key = `${y}-${m}-${day}`;
+    const todayKey2 = (() => {
+      const n = new Date();
+      return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+    })();
+    week.push({ date: d, key, isToday: key === todayKey2 });
   }
   return week;
 }
@@ -2423,8 +2419,10 @@ function agSelectDay(key) {
 function renderAgendaContent() {
   const el      = document.getElementById('agContent');
   const entries = agendaData[agSelectedDay] || [];
-  const date    = new Date(agSelectedDay + 'T12:00:00');
-  const isToday = date.toDateString() === new Date().toDateString();
+  const [dy, dm, dd] = agSelectedDay.split('-').map(Number);
+  const date    = new Date(dy, dm-1, dd);
+  const todayLocal = new Date();
+  const isToday = date.getFullYear()===todayLocal.getFullYear() && date.getMonth()===todayLocal.getMonth() && date.getDate()===todayLocal.getDate();
 
   const tagOpts = [
     {v:'evento',   l:'Evento'},
@@ -2541,113 +2539,148 @@ sgUpdateCounter();
 
 /* ══════════════════════════════════════════
    WELCOME / LOGIN LOGIC
-══════════════════════════════════════════ */
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═   WELCOME / LOGIN LOGIC
+═ */
 const WLC_PHRASES = [
   '"No necesitás motivación para empezar. Solo necesitás empezar."',
   '"La disciplina no es un don. Es una decisión que tomás cada día."',
   '"Empezá mal, empezá tarde, empezá con miedo. Pero empezá."',
-  '"El hábito se construye con acciones pequeñas repetidas, no con grandes momentos."',
+  '"El hábito se construye con acciones pequeñas repetidas."',
   '"No hay días perfectos. Hay días en que igual lo hacés."',
   '"La constancia no es hacer todo bien. Es volver aunque hayas fallado."',
 ];
 
-const AVATARS = ['🦁','🐺','🦊','🐻','🦅','🐬','🌙','⚡','🔥','🎯','💪','🚀'];
-
-let selectedAvatar = '🦁';
-
 function wlcInit() {
-  // Render avatars
-  const ar = document.getElementById('wlcAvatars');
-  if(ar) {
-    ar.innerHTML = AVATARS.map(a =>
-      `<div class="wlc-avatar ${a===selectedAvatar?'selected':''}" onclick="wlcSelectAvatar('${a}')">${a}</div>`
-    ).join('');
-  }
-
-  // Random phrase
   const ph = document.getElementById('wlcPhrase');
-  if(ph) ph.innerHTML = WLC_PHRASES[Math.floor(Math.random()*WLC_PHRASES.length)];
-
-  // Check if user exists
-  const user = JSON.parse(localStorage.getItem('midia_user') || 'null');
-  if(user && user.nombre) {
-    wlcEnterApp(user);
+  if(ph) ph.textContent = WLC_PHRASES[Math.floor(Math.random()*WLC_PHRASES.length)];
+  const session = localStorage.getItem('midia_session');
+  if(session) {
+    const users = JSON.parse(localStorage.getItem('midia_users') || '{}');
+    if(users[session]) { wlcEnterApp(users[session]); return; }
+    localStorage.removeItem('midia_session');
   }
-}
-
-function wlcSelectAvatar(a) {
-  selectedAvatar = a;
-  document.querySelectorAll('.wlc-avatar').forEach(el => {
-    el.classList.toggle('selected', el.textContent === a);
-  });
 }
 
 function wlcShow(screen) {
   document.querySelectorAll('.wlc-screen').forEach(s => s.classList.remove('active'));
   document.getElementById('wlc-'+screen)?.classList.add('active');
-  if(screen==='registro') document.getElementById('wlc-nombre')?.focus();
-  if(screen==='login')    document.getElementById('wlc-login-nombre')?.focus();
+  ['reg-error','log-error'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=''; });
 }
 
 function wlcRegistrar() {
-  const nombre = document.getElementById('wlc-nombre')?.value.trim();
-  if(!nombre) {
-    document.getElementById('wlc-nombre').style.borderColor = 'var(--crit)';
-    return;
-  }
-  const user = { nombre, avatar: selectedAvatar };
-  localStorage.setItem('midia_user', JSON.stringify(user));
-  wlcEnterApp(user);
+  const nombre  = document.getElementById('reg-nombre')?.value.trim();
+  const usuario = document.getElementById('reg-usuario')?.value.trim().toLowerCase().replace(/\s+/g,'');
+  const pass    = document.getElementById('reg-pass')?.value;
+  const pass2   = document.getElementById('reg-pass2')?.value;
+  const errEl   = document.getElementById('reg-error');
+  if(!nombre||!usuario||!pass||!pass2){errEl.textContent='Completá todos los campos.';return;}
+  if(usuario.length<3){errEl.textContent='Usuario: mínimo 3 caracteres.';return;}
+  if(pass.length<4){errEl.textContent='Contraseña: mínimo 4 caracteres.';return;}
+  if(pass!==pass2){errEl.textContent='Las contraseñas no coinciden.';return;}
+  const users = JSON.parse(localStorage.getItem('midia_users')||'{}'  );
+  if(users[usuario]){errEl.textContent='Ese usuario ya existe.';return;}
+  users[usuario] = {nombre, usuario, passHash: btoa(pass+usuario)};
+  localStorage.setItem('midia_users',JSON.stringify(users));
+  localStorage.setItem('midia_session',usuario);
+  wlcEnterApp(users[usuario]);
 }
 
 function wlcLogin() {
-  const nombre = document.getElementById('wlc-login-nombre')?.value.trim();
-  if(!nombre) {
-    document.getElementById('wlc-login-nombre').style.borderColor = 'var(--crit)';
-    return;
-  }
-  const saved = JSON.parse(localStorage.getItem('midia_user') || 'null');
-  if(saved && saved.nombre.toLowerCase() === nombre.toLowerCase()) {
-    wlcEnterApp(saved);
-  } else {
-    // Create new user with that name
-    const user = { nombre, avatar: selectedAvatar };
-    localStorage.setItem('midia_user', JSON.stringify(user));
-    wlcEnterApp(user);
-  }
+  const usuario = document.getElementById('log-usuario')?.value.trim().toLowerCase().replace(/\s+/g,'');
+  const pass    = document.getElementById('log-pass')?.value;
+  const errEl   = document.getElementById('log-error');
+  if(!usuario||!pass){errEl.textContent='Ingresá usuario y contraseña.';return;}
+  const users = JSON.parse(localStorage.getItem('midia_users')||'{}'  );
+  const user  = users[usuario];
+  if(!user){errEl.textContent='Usuario no encontrado.';return;}
+  if(user.passHash !== btoa(pass+usuario)){errEl.textContent='Contraseña incorrecta.';return;}
+  localStorage.setItem('midia_session',usuario);
+  wlcEnterApp(user);
 }
 
 function wlcEnterApp(user) {
-  // Update header
-  document.getElementById('userPillAvatar').textContent = user.avatar || '🦁';
+  document.getElementById('userPillAvatar').textContent = '👤';
   document.getElementById('userPillName').textContent   = user.nombre;
-  document.getElementById('menuUserName').textContent   = user.avatar + ' ' + user.nombre;
-
-  // Hide overlay
+  document.getElementById('menuUserName').textContent   = user.nombre;
   const ov = document.getElementById('welcomeOverlay');
-  if(ov) {
-    ov.classList.add('hidden');
-    setTimeout(()=>{ ov.style.display='none'; }, 500);
-  }
-
-  toast(`¡Hola ${user.avatar} ${user.nombre}! 👋`);
-
-  // Ask for notification permission
+  if(ov){ov.classList.add('hidden');setTimeout(()=>{ov.style.display='none';},500);}
+  loadUserData();
+  agendaData = JSON.parse(localStorage.getItem(getUserKey('midia_agenda_v1'))||'{}'  );
+  renderTimeline();renderHabits();renderAgendaDays();renderAgendaContent();updateProgress();
+  toast('¡Bienvenido, '+user.nombre+'!');
   requestNotifPermission();
 }
 
-/* ══════════════════════════════════════════
-   NOTIFICATIONS
-══════════════════════════════════════════ */
+function wlcCerrarSesion() {
+  closeUserMenu();
+  localStorage.removeItem('midia_session');
+  blocks=[];habits=[];history={};dayState={};
+  renderTimeline();renderHabits();
+  const ov=document.getElementById('welcomeOverlay');
+  if(ov){ov.style.display='';setTimeout(()=>{ov.classList.remove('hidden');},10);}
+  wlcShow('inicio');wlcInit();
+}
+
+function toggleUserMenu(){document.getElementById('userMenu').classList.toggle('open');}
+function closeUserMenu(){document.getElementById('userMenu').classList.remove('open');}
+
+document.addEventListener('click',e=>{
+  const menu=document.getElementById('userMenu');
+  const pill=document.getElementById('userPill');
+  if(menu&&pill&&!menu.contains(e.target)&&!pill.contains(e.target))closeUserMenu();
+});
+
+document.getElementById('reg-pass2')?.addEventListener('keydown',e=>{if(e.key==='Enter')wlcRegistrar();});
+document.getElementById('log-pass')?.addEventListener('keydown',e=>{if(e.key==='Enter')wlcLogin();});
+
 function requestNotifPermission() {
   if(!('Notification' in window)) return;
   if(Notification.permission === 'default') {
     setTimeout(()=>{
       Notification.requestPermission().then(perm => {
-        if(perm === 'granted') {
-          toast('🔔 Notificaciones activadas');
-          scheduleNotifications();
-        }
+        if(perm === 'granted') { toast('🔔 Notificaciones activadas'); scheduleNotifications(); }
       });
     }, 2000);
   } else if(Notification.permission === 'granted') {
@@ -2655,115 +2688,41 @@ function requestNotifPermission() {
   }
 }
 
-function sendNotif(title, body, icon) {
+function sendNotif(title, body) {
   if(Notification.permission !== 'granted') return;
-  new Notification(title, {
-    body,
-    icon: icon || '📱',
-    badge: '📱',
-    vibrate: [200, 100, 200],
-  });
+  try { new Notification(title, { body }); } catch(e) {}
 }
 
 function scheduleNotifications() {
-  // Check every minute if it's time for a block notification
   setInterval(() => {
-    const user = JSON.parse(localStorage.getItem('midia_user') || '{}');
-    if(!user.nombre) return;
-
-    const now   = new Date();
-    const hh    = now.getHours();
-    const mm    = now.getMinutes();
-    const curMin = hh * 60 + mm;
-
-    // Load user blocks
-    const uKey   = getUserKey('midia_blocks_v4');
-    const uBlocks = JSON.parse(localStorage.getItem(uKey) || 'null') || DEFAULT_BLOCKS;
-    const uState  = JSON.parse(localStorage.getItem(getUserKey('midia_state_v4')) || '{}');
-
-    uBlocks.forEach(b => {
-      const [bh, bm] = b.start.split(':').map(Number);
-      const bMin = bh * 60 + bm;
-      // Notify exactly at block start time
-      if(curMin === bMin && !uState[b.id]) {
-        sendNotif(
-          `⏰ ${b.emoji || ''} ${b.name}`,
-          `Es hora: ${b.start} — ${b.planb ? 'Plan B: ' + b.planb : 'Ya es el momento'}`,
-        );
-      }
-      // 5 min warning
-      if(curMin === bMin - 5 && !uState[b.id]) {
-        sendNotif(
-          `🔔 En 5 minutos: ${b.name}`,
-          `Preparate para tu próxima actividad`,
-        );
-      }
+    const session = localStorage.getItem('midia_session');
+    if(!session) return;
+    const users = JSON.parse(localStorage.getItem('midia_users') || '{}');
+    const user  = users[session];
+    if(!user) return;
+    const now = new Date();
+    const hh = now.getHours(), mm = now.getMinutes();
+    const curMin = hh*60+mm;
+    blocks.forEach(b => {
+      const [bh,bm] = b.start.split(':').map(Number);
+      const bMin = bh*60+bm;
+      if(curMin===bMin && !dayState[b.id])
+        sendNotif('⏰ '+(b.emoji||'')+' '+b.name, 'Es hora: '+b.start);
+      if(curMin===bMin-5 && !dayState[b.id])
+        sendNotif('🔔 En 5 min: '+b.name, 'Preparate para tu próxima actividad');
     });
-
-    // Daily morning motivation at 6am
-    if(hh === 6 && mm === 0) {
-      const phrases = [
-        'Hoy igual lo hacés. Sin excusas.',
-        'Un día más. Un paso más.',
-        'Empezá. Lo demás viene solo.',
-      ];
-      sendNotif(
-        `☀️ Buenos días, ${user.nombre}!`,
-        phrases[Math.floor(Math.random() * phrases.length)],
-      );
-    }
-
-    // Night reminder at 11pm
-    if(hh === 23 && mm === 0) {
-      const pct = calcProgress();
-      sendNotif(
-        `🌙 Fin del día — ${pct}% completado`,
-        pct >= 70 ? '¡Muy bien hoy! Descansá.' : 'Mañana es otro día. Seguís.',
-      );
-    }
-
-  }, 60000); // every minute
+    if(hh===6&&mm===0) sendNotif('☀️ Buenos días, '+user.nombre+'!','Empezá. Lo demás viene solo.');
+    if(hh===23&&mm===0) sendNotif('🌙 Fin del día — '+calcProgress()+'% completado', calcProgress()>=70?'¡Muy bien hoy!':'Mañana es otro día.');
+  }, 60000);
 }
 
-// Manual notification test (called from user menu)
 function testNotif() {
-  const user = JSON.parse(localStorage.getItem('midia_user') || '{}');
-  sendNotif(`👋 Hola ${user.nombre || ''}!`, 'Las notificaciones funcionan correctamente.');
+  const session = localStorage.getItem('midia_session');
+  const users   = JSON.parse(localStorage.getItem('midia_users') || '{}');
+  const user    = users[session] || {};
+  sendNotif('👋 Hola '+(user.nombre||'')+'!', 'Las notificaciones funcionan.');
   closeUserMenu();
 }
-
-function wlcCerrarSesion() {
-  closeUserMenu();
-  localStorage.removeItem('midia_user');
-  const ov = document.getElementById('welcomeOverlay');
-  if(ov) {
-    ov.style.display = '';
-    setTimeout(()=>{ ov.classList.remove('hidden'); }, 10);
-  }
-  wlcShow('inicio');
-  wlcInit();
-}
-
-function toggleUserMenu() {
-  document.getElementById('userMenu').classList.toggle('open');
-}
-
-function closeUserMenu() {
-  document.getElementById('userMenu').classList.remove('open');
-}
-
-// Close menu on outside click
-document.addEventListener('click', e => {
-  const menu = document.getElementById('userMenu');
-  const pill = document.getElementById('userPill');
-  if(menu && pill && !menu.contains(e.target) && !pill.contains(e.target)) {
-    closeUserMenu();
-  }
-});
-
-// Enter key on login/register
-document.getElementById('wlc-nombre')?.addEventListener('keydown', e=>{ if(e.key==='Enter') wlcRegistrar(); });
-document.getElementById('wlc-login-nombre')?.addEventListener('keydown', e=>{ if(e.key==='Enter') wlcLogin(); });
 
 wlcInit();
 </script>
