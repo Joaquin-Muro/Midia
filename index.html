@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mi Día">
+<meta name="application-name" content="Mi Día">
+<link rel="manifest" href="/manifest.json">
 <title>Mi Día — Organizador Personal</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
@@ -2677,6 +2679,20 @@ document.getElementById('log-pass')?.addEventListener('keydown',e=>{if(e.key==='
 
 function requestNotifPermission() {
   if(!('Notification' in window)) return;
+
+  // Register Service Worker first
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => {
+        console.log('SW registered');
+        // Try periodic sync for background notifications
+        if('periodicSync' in reg) {
+          reg.periodicSync.register('midia-check', { minInterval: 60 * 1000 })
+            .catch(() => {});
+        }
+      }).catch(() => {});
+  }
+
   if(Notification.permission === 'default') {
     setTimeout(()=>{
       Notification.requestPermission().then(perm => {
@@ -2690,37 +2706,91 @@ function requestNotifPermission() {
 
 function sendNotif(title, body) {
   if(Notification.permission !== 'granted') return;
-  try { new Notification(title, { body }); } catch(e) {}
+  // Use service worker for reliable delivery
+  if('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'SCHEDULE_NOTIF', title, body, delay: 0
+    });
+  } else {
+    try { new Notification(title, { body, vibrate:[200,100,200] }); } catch(e) {}
+  }
 }
 
 function scheduleNotifications() {
-  setInterval(() => {
-    const session = localStorage.getItem('midia_session');
-    if(!session) return;
-    const users = JSON.parse(localStorage.getItem('midia_users') || '{}');
-    const user  = users[session];
-    if(!user) return;
-    const now = new Date();
-    const hh = now.getHours(), mm = now.getMinutes();
-    const curMin = hh*60+mm;
-    blocks.forEach(b => {
-      const [bh,bm] = b.start.split(':').map(Number);
-      const bMin = bh*60+bm;
-      if(curMin===bMin && !dayState[b.id])
-        sendNotif('⏰ '+(b.emoji||'')+' '+b.name, 'Es hora: '+b.start);
-      if(curMin===bMin-5 && !dayState[b.id])
-        sendNotif('🔔 En 5 min: '+b.name, 'Preparate para tu próxima actividad');
-    });
-    if(hh===6&&mm===0) sendNotif('☀️ Buenos días, '+user.nombre+'!','Empezá. Lo demás viene solo.');
-    if(hh===23&&mm===0) sendNotif('🌙 Fin del día — '+calcProgress()+'% completado', calcProgress()>=70?'¡Muy bien hoy!':'Mañana es otro día.');
-  }, 60000);
+  // Schedule today's blocks
+  if(!blocks.length) return;
+
+  const now    = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+
+  blocks.forEach(b => {
+    if(dayState[b.id]) return; // already done
+    const [bh, bm] = b.start.split(':').map(Number);
+    const bMin = bh*60+bm;
+
+    // 5 min warning
+    const warn5 = (bMin - 5 - nowMin) * 60 * 1000;
+    if(warn5 > 0 && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'SCHEDULE_NOTIF',
+        title: '🔔 En 5 min: ' + b.name,
+        body:  'Preparate para tu próxima actividad',
+        delay: warn5
+      });
+    }
+
+    // On time
+    const onTime = (bMin - nowMin) * 60 * 1000;
+    if(onTime > 0 && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'SCHEDULE_NOTIF',
+        title: '⏰ ' + (b.emoji||'') + ' ' + b.name,
+        body:  'Es hora: ' + b.start,
+        delay: onTime
+      });
+    }
+  });
+
+  // Morning 6am
+  const morning = new Date(); morning.setHours(6,0,0,0);
+  if(morning > now) {
+    const delay = morning - now;
+    if('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'SCHEDULE_NOTIF',
+        title: '☀️ Buenos días!',
+        body:  'Empezá. Lo demás viene solo.',
+        delay
+      });
+    }
+  }
+
+  // Night 11pm
+  const night = new Date(); night.setHours(23,0,0,0);
+  if(night > now) {
+    const delay = night - now;
+    if('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'SCHEDULE_NOTIF',
+        title: '🌙 Fin del día',
+        body:  'Cerrá el día. Mañana seguís.',
+        delay
+      });
+    }
+  }
 }
 
 function testNotif() {
   const session = localStorage.getItem('midia_session');
   const users   = JSON.parse(localStorage.getItem('midia_users') || '{}');
   const user    = users[session] || {};
-  sendNotif('👋 Hola '+(user.nombre||'')+'!', 'Las notificaciones funcionan.');
+  if(Notification.permission !== 'granted') {
+    Notification.requestPermission().then(p => {
+      if(p==='granted') sendNotif('👋 Hola '+(user.nombre||'')+'!', 'Las notificaciones funcionan.');
+    });
+  } else {
+    sendNotif('👋 Hola '+(user.nombre||'')+'!', 'Las notificaciones funcionan.');
+  }
   closeUserMenu();
 }
 
